@@ -1,0 +1,18 @@
+GET http://localhost:3001/setores
+###
+
+POST http://localhost:3001/setores
+Content-Type: application/json
+
+{
+  "nome": "Setor de TI TESTEE",
+  "descricao": "Setor responsável pela tecnologia da informação TESTEEE"
+}
+###
+
+PATCH  http://localhost:3001/setores/1
+Content-Type: application/json
+
+{
+  "nome": "Setor de TI TESTEE ATUALIZADO"
+}
