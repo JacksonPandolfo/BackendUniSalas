@@ -9,53 +9,44 @@ datasource db {
 }
 
 enum StatusSala {
-  LIVRE
-  OCUPADA
-  MANUTENCAO
-  DESATIVADA
+  LIVRE           //Sala livre (Sem reserva)
+  OCUPADA         //Sala ocupada (Com reserva)
+  MANUTENCAO      //Sala em manutenção
+  DESATIVADA      //Sala desativada
 }
 
 enum Cargo {
-  ADMINISTRADOR //Controle total na aplicação.
-  ATENDIMENTO   //Equipe de postos, responsável por validar e aceitar as reservas.
+  ADMINISTRADOR   //Controle total na aplicação.
+  ATENDIMENTO     //Equipe de postos, responsável por validar e aceitar as reservas.
   MINISTRANTE     //Ministrante das aulas, pode realizar reservas.
-  FUNCIONARIO   //Qualquer funcionário, terá acesso a realizar reservas.
-}
-enum DiaSemana {
-  SEGUNDA
-  TERCA
-  QUARTA
-  QUINTA
-  SEXTA
-  SABADO
-  DOMINGO
+  FUNCIONARIO     //Qualquer funcionário, terá acesso a realizar reservas.
 }
 
 enum TipoReserva {
-  ESPORADICA    //Reservas que são esporádicas, não ocorrem durante todo o semestre
-  RECORRENTE    //Reservas recorrentes que ocorrem todo o semestre, geralmente aulas
+  ESPORADICA      //Reservas que são esporádicas, não ocorrem durante todo o semestre
+  RECORRENTE      //Reservas recorrentes que ocorrem todo o semestre, geralmente aulas
 }
 
 enum TipoEvento {
-  AULA
-  PALESTRA
-  BANCA
-  REUNIAO
+  AULA            //Evento pode ser uma aula
+  PALESTRA        //Evento pode ser palestra
+  BANCA           //Evento pode ser banca
+  REUNIAO         //Evento pode ser uma reunião
 }
 
 model Usuario {
-  id              Int       @id @default(autoincrement())
-  nome            String
-  sobrenome       String
-  email           String    @unique
-  dataNascimento  DateTime
-  cargos           Cargo     @default(FUNCIONARIO)
+  id                 Int          @id @default(autoincrement())
+  nome               String
+  sobrenome          String
+  email              String       @unique
+  dataNascimento     DateTime
+  cargos             Cargo[]
 
-  Turma Turma[]
-  TurmaAluno TurmaAluno[]
-  ReservaMinistrante Reserva[] @relation("ReservaMinistrante")
-  ReservaSolicitante Reserva[] @relation("ReservaSolicitante")
-  ReservaAprovador Reserva[] @relation("ReservaAprovador")
+  Turmas             Turma[]      //Turmas que o ministrante está ligado
+  TurmaAlunos        TurmaAluno[]
+  ReservaMinistrante Reserva[]    @relation("ReservaMinistrante")
+  ReservaSolicitante Reserva[]    @relation("ReservaSolicitante")
+  ReservaAprovador   Reserva[]    @relation("ReservaAprovador")
 }
 
 model Setor {
@@ -63,7 +54,6 @@ model Setor {
   nome      String    @unique
   descricao String
   blocos    Bloco[]
-  salas     Sala[]
 }
 
 model Bloco {
@@ -75,77 +65,90 @@ model Bloco {
 }
 
 model Sala {
-  id                Int        @id @default(autoincrement())
-  numero            Int
-  statusSala        StatusSala @default(LIVRE)
-  temAcessibilidade Boolean
-  capacidade        Int
-  setorId           Int
-  blocoId           Int
-  setor             Setor      @relation(fields: [setorId], references: [id])
-  bloco             Bloco      @relation(fields: [blocoId], references: [id])
+  id                  Int         @id @default(autoincrement())
+  numero              Int
+  temAcessibilidade   Boolean
+  capacidade          Int
+  blocoId             Int
+  statusSala          StatusSala  @default(LIVRE)
+  bloco               Bloco       @relation(fields: [blocoId], references: [id])
+
+  Reservas            Reserva[]
 
   @@index([statusSala])
-  @@index([setorId, blocoId, numero])
-  Reserva Reserva[]
+  @@index([blocoId, numero])
 }
 
 model Curso{
-  id Int @id @default(autoincrement())
-  nome String
-  disciplinas CursoDisciplina[]
+  id          Int          @id @default(autoincrement())
+  nome        String
 
-  Turma Turma[]
+  Turmas      Turma[]
+  Curriculos  Curriculo[]
 }
 
-model CursoDisciplina {
-  id Int @id @default(autoincrement())
-  cursoId Int
-  disciplinaId Int
 
-  curso Curso @relation(fields: [cursoId], references: [id])
-  disciplina Disciplina @relation(fields: [disciplinaId], references: [id])
-  @@unique([cursoId, disciplinaId])
+model Curriculo {
+  id                Int     @id @default(autoincrement())
+  versaoCurriculo   Int
+  cursoId           Int
+  curso             Curso   @relation(fields: [cursoId], references: [id])
+
+  disciplinas       CurriculoDisciplina[]
+}
+
+model CurriculoDisciplina {
+  id            Int         @id @default(autoincrement())
+  curriculoId   Int
+  disciplinaId  Int
+  obrigatoria   Boolean
+  semestre      Int
+
+  curriculo     Curriculo   @relation(fields: [curriculoId], references: [id])
+  disciplina    Disciplina  @relation(fields: [disciplinaId], references: [id])
+
+  @@unique([curriculoId, disciplinaId])
 }
 
 model Disciplina {
-  id Int @id @default(autoincrement())
-  nome String
-  numeroCreditos Int
-  cargaHoraria Int
-  cursos CursoDisciplina[]
+  id              Int       @id @default(autoincrement())
+  nome            String
+  numeroCreditos  Int
+  cargaHoraria    Int
 
-  Turma Turma[]
+  curriculos      CurriculoDisciplina[]
+  turmas          Turma[]
 }
 
 model Turma {
-  id Int @id @default(autoincrement())
-  vagas Int @default(40)
-  cursoId Int
-  disciplinaId Int
-  ministranteId Int?
+  id              Int         @id @default(autoincrement())
+  vagas           Int         @default(40)
+  cursoId         Int
+  disciplinaId    Int
+  ministranteId   Int?
 
-  curso Curso @relation(fields: [cursoId], references: [id])
-  disciplina Disciplina @relation(fields: [disciplinaId], references: [id])
-  ministrante Usuario? @relation(fields: [ministranteId], references: [id])
+  curso           Curso       @relation(fields: [cursoId], references: [id])
+  disciplina      Disciplina  @relation(fields: [disciplinaId], references: [id])
+  ministrante     Usuario?    @relation(fields: [ministranteId], references: [id])
 
-  alunos TurmaAluno[]
-  horarios TurmaHorario[]
-  Reserva Reserva[]
+  alunos          TurmaAluno[]
+  horarios        TurmaHorario[]
+  Reserva         Reserva[]
 }
+
 model TurmaAluno {
-  id       Int    @id @default(autoincrement())
+  id       Int      @id @default(autoincrement())
   turmaId  Int
   alunoId  Int
 
-  turma    Turma  @relation(fields: [turmaId], references: [id])
-  aluno    Usuario @relation(fields: [alunoId], references: [id])
+  turma    Turma    @relation(fields: [turmaId], references: [id])
+  aluno    Usuario  @relation(fields: [alunoId], references: [id])
 
   @@unique([turmaId, alunoId])
 }
 
 model TurmaHorario {
-  id        Int @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   turmaId   Int
   horarioId Int
 
@@ -156,33 +159,32 @@ model TurmaHorario {
 }
 
 model Horario {
-  id Int @id @default(autoincrement())
-  nome String
-  horaInicio DateTime
-  horaFim DateTime
+  id            Int         @id @default(autoincrement())
+  nome          String
+  horaInicio    DateTime
+  horaFim       DateTime
 
-  reservas Reserva[]
-  TurmaHorario TurmaHorario[]
+  reservas      Reserva[]
+  TurmaHorario  TurmaHorario[]
 }
 
 model Reserva {
-  id Int @id @default(autoincrement())
-  tipoReserva TipoReserva
-  tipoEvento TipoEvento
-  dataInicio DateTime
-  dataFim DateTime
-  diaSemana DiaSemana?
-  horarioId Int
-  salaId Int
-  turmaId Int?
-  ministranteId Int
-  solicitanteId Int
-  aprovadorId Int
+  id              Int           @id @default(autoincrement())
+  tipoReserva     TipoReserva
+  tipoEvento      TipoEvento
+  dataInicio      DateTime
+  dataFim         DateTime
+  horarioId       Int
+  salaId          Int
+  turmaId         Int?
+  ministranteId   Int
+  solicitanteId   Int
+  aprovadorId     Int
 
-  horario Horario @relation(fields: [horarioId], references: [id])
-  sala Sala @relation(fields: [salaId], references: [id])
-  turma Turma? @relation(fields: [turmaId], references: [id])
-  ministrante Usuario @relation("ReservaMinistrante", fields: [ministranteId], references: [id])
-  solicitante Usuario @relation("ReservaSolicitante", fields: [solicitanteId], references: [id])
-  aprovador Usuario @relation("ReservaAprovador", fields: [aprovadorId], references: [id])
+  horario         Horario       @relation(fields: [horarioId], references: [id])
+  sala            Sala          @relation(fields: [salaId], references: [id])
+  turma           Turma?        @relation(fields: [turmaId], references: [id])
+  ministrante     Usuario       @relation("ReservaMinistrante", fields: [ministranteId], references: [id])
+  solicitante     Usuario       @relation("ReservaSolicitante", fields: [solicitanteId], references: [id])
+  aprovador       Usuario       @relation("ReservaAprovador", fields: [aprovadorId], references: [id])
 }
