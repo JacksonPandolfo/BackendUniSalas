@@ -9,17 +9,17 @@ datasource db {
 }
 
 enum StatusSala {
-  LIVRE //Sala livre (Sem reserva)
-  OCUPADA //Sala ocupada (Com reserva)
-  MANUTENCAO //Sala em manutenção
-  DESATIVADA //Sala desativada
+  LIVRE       //Sala livre (Sem reserva)
+  OCUPADA     //Sala ocupada (Com reserva)
+  MANUTENCAO  //Sala em manutenção
+  DESATIVADA  //Sala desativada
 }
 
 enum Cargo {
   ADMINISTRADOR //Controle total na aplicação.
-  ATENDIMENTO //Equipe de postos, responsável por validar e aceitar as reservas.
-  MINISTRANTE //Ministrante das aulas, pode realizar reservas.
-  FUNCIONARIO //Qualquer funcionário, terá acesso a realizar reservas.
+  ATENDIMENTO   //Equipe de postos, responsável por validar e aceitar as reservas.
+  MINISTRANTE   //Ministrante das aulas, pode realizar reservas.
+  FUNCIONARIO   //Qualquer funcionário, terá acesso a realizar reservas.
 }
 
 enum TipoReserva {
@@ -28,22 +28,26 @@ enum TipoReserva {
 }
 
 enum TipoEvento {
-  AULA //Evento pode ser uma aula
-  PALESTRA //Evento pode ser palestra
-  BANCA //Evento pode ser banca
-  REUNIAO //Evento pode ser uma reunião
-  EVENTO //Evento de pessoas externas
+  AULA      //Evento pode ser uma aula
+  PALESTRA  //Evento pode ser palestra
+  BANCA     //Evento pode ser banca
+  REUNIAO   //Evento pode ser uma reunião
+  EVENTO    //Evento de pessoas externas
 }
 
 enum TipoMobiliario {
   MESADESENHO
-  CADEIRA
+  CADEIRABRACO
+  MESAREUNIAO
+  MOBILIARIOMOVEL
 }
 
 enum TipoEquipamento {
   CAIXASOM
   PROJETOR
   COMPUTADOR
+  MICROFONE
+  WEBCAM
 }
 
 model Usuario {
@@ -76,14 +80,13 @@ model Bloco {
   salas   Sala[]
 }
 
-//tipo imobiliario e tipo equipamento
 model Sala {
   id                Int        @id @default(autoincrement())
   numero            Int
   temAcessibilidade Boolean
   capacidade        Int
-  tipoMobiliario    String //Montar enum do mobiliario
-  tipoEquipamento   String //Montar enum do equipamento
+  tipoMobiliario    TipoMobiliario
+  tipoEquipamento   TipoEquipamento
   blocoId           Int
   statusSala        StatusSala @default(LIVRE)
   bloco             Bloco      @relation(fields: [blocoId], references: [id])
