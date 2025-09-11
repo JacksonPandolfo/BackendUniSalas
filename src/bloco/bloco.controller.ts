@@ -33,3 +33,4 @@ export class BlocoController {
     return this.blocoService.remove(+id);
   }
 }
+

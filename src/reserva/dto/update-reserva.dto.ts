@@ -1,4 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
+/* eslint-disable prettier/prettier */
 import { CreateReservaDto } from './create-reserva.dto';
 
-export class UpdateReservaDto extends PartialType(CreateReservaDto) {}
+export interface UpdateReservaDto extends Partial<CreateReservaDto> {
+    id: number
+}

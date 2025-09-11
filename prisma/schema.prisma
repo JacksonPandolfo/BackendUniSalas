@@ -55,7 +55,8 @@ model Usuario {
   nome           String
   sobrenome      String
   email          String   @unique
-  dataNascimento DateTime
+  dataNascimento DateTime @db.Date
+  senha          String
   cargos         Cargo[]
 
   Turmas             Turma[] //Turmas que o ministrante está ligado
@@ -139,6 +140,7 @@ model Disciplina {
 
 model Turma {
   id            Int  @id @default(autoincrement())
+  nome          String
   vagas         Int  @default(40)
   cursoId       Int
   disciplinaId  Int
@@ -178,8 +180,8 @@ model TurmaHorario {
 model Horario {
   id         Int      @id @default(autoincrement())
   nome       String
-  horaInicio DateTime
-  horaFim    DateTime
+  horaInicio DateTime @db.Time
+  horaFim    DateTime @db.Time
 
   reservas     Reserva[]
   TurmaHorario TurmaHorario[]
@@ -189,8 +191,8 @@ model Reserva {
   id            Int         @id @default(autoincrement())
   tipoReserva   TipoReserva
   tipoEvento    TipoEvento
-  dataInicio    DateTime
-  dataFim       DateTime
+  dataInicio    DateTime @db.Date
+  dataFim       DateTime @db.Date
   horarioId     Int
   salaId        Int
   turmaId       Int?

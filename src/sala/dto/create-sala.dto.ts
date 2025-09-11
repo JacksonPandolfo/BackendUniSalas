@@ -10,3 +10,4 @@ export class CreateSalaDto {
     tipoEquipamento: TipoEquipamento;
     tipoMobiliario: TipoMobiliario;
 }
+
