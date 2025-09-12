@@ -15,12 +15,34 @@ export class SalaService {
   }
 
   findAll() {
-    return this.prismaService.sala.findMany()
+    return this.prismaService.sala.findMany({
+      include: {
+        Mobiliarios: true,
+        Equipamentos: true
+      }
+    })
   }
 
   findOne(id: number) {
     return this.prismaService.sala.findUnique({
-      where: {id}
+      where: {id},
+      include: {
+        Mobiliarios: true,
+        Equipamentos: true
+      }
+    })
+  }
+
+  findBySetor(setorid: number) {
+    return this.prismaService.sala.findMany({
+      where: {
+        bloco: { setorId: setorid }
+      },
+      include: {
+        Mobiliarios: true,
+        Equipamentos: true,
+        bloco: true
+      }
     })
   }
 

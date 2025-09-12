@@ -15,11 +15,19 @@ export class SalaController {
 
   @Get()
   findAll() {
+    console.log("findAll")
     return this.salaService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
+    console.log("findOne")
+    return this.salaService.findOne(+id);
+  }
+
+  @Get('bySetor/:id')
+  findBySetor(@Param('id') id: string) {
+    console.log("findOne")
     return this.salaService.findOne(+id);
   }
 
