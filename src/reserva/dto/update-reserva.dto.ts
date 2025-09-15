@@ -2,5 +2,5 @@
 import { CreateReservaDto } from './create-reserva.dto';
 
 export interface UpdateReservaDto extends Partial<CreateReservaDto> {
-    id: number
+    id: string
 }

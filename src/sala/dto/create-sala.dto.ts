@@ -6,7 +6,7 @@ export class CreateSalaDto {
     statusSala: StatusSala;
     temAcessibilidade: boolean;
     capacidade: number;
-    blocoId: number;
+    blocoId: string;
     tipoEquipamento: TipoEquipamento;
     tipoMobiliario: TipoMobiliario;
 }

@@ -2,15 +2,16 @@
 import { TipoEvento, TipoReserva } from "generated/prisma"
 
 export class CreateReservaDto {
-    id: number
+    id: string
     tipoReserva: TipoReserva
     tipoEvento: TipoEvento
+    diaSemana: number
     dataInicio: Date
     dataFim: Date
-    horarioId: number
-    salaId: number
-    turmaId?: number
-    ministranteId: number
-    solicitanteId: number
-    aprovadorId: number
+    horarioId: string
+    salaId: string
+    turmaId?: string
+    ministranteId: string
+    solicitanteId: string
+    aprovadorId: string
 }

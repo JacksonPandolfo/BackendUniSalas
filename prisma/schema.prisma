@@ -51,7 +51,7 @@ enum TipoEquipamento {
 }
 
 model Usuario {
-  id             Int      @id @default(autoincrement())
+  id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   nome           String
   sobrenome      String
   email          String   @unique
@@ -67,28 +67,28 @@ model Usuario {
 }
 
 model Setor {
-  id        Int     @id @default(autoincrement())
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   nome      String  @unique
   descricao String
   blocos    Bloco[]
 }
 
 model Bloco {
-  id      Int    @id @default(autoincrement())
+  id      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   numero  Int
-  setorId Int
-  setor   Setor  @relation(fields: [setorId], references: [id])
+  setorId String    @db.Uuid
+  setor   Setor     @relation(fields: [setorId], references: [id])
   salas   Sala[]
 }
 
 model Sala {
-  id                Int        @id @default(autoincrement())
+  id                String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   numero            Int
   temAcessibilidade Boolean
   capacidade        Int
-  blocoId           Int
-  statusSala        StatusSala @default(LIVRE)
-  bloco             Bloco      @relation(fields: [blocoId], references: [id])
+  blocoId           String      @db.Uuid
+  statusSala        StatusSala  @default(LIVRE)
+  bloco             Bloco       @relation(fields: [blocoId], references: [id])
 
   Reservas          Reserva[]
   Equipamentos      SalaEquipamento[]
@@ -99,23 +99,23 @@ model Sala {
 }
 
 model SalaMobiliario {
-  id             Int  @id @default(autoincrement())
-  salaId         Int
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salaId         String   @db.Uuid
   tipoMobiliario TipoMobiliario
 
   sala           Sala @relation(fields: [salaId], references: [id])
 }
 
 model SalaEquipamento {
-  id              Int  @id @default(autoincrement())
-  salaId          Int
+  id              String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salaId          String  @db.Uuid
   tipoEquipamento TipoEquipamento
 
   sala            Sala @relation(fields: [salaId], references: [id])
 }
 
 model Curso {
-  id         Int    @id @default(autoincrement())
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   nome       String
 
   Turmas     Turma[]
@@ -123,18 +123,18 @@ model Curso {
 }
 
 model Curriculo {
-  id              Int   @id @default(autoincrement())
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   versaoCurriculo Int
-  cursoId         Int
-  curso           Curso @relation(fields: [cursoId], references: [id])
+  cursoId         String    @db.Uuid
+  curso           Curso     @relation(fields: [cursoId], references: [id])
 
   disciplinas     CurriculoDisciplina[]
 }
 
 model CurriculoDisciplina {
-  id           Int        @id @default(autoincrement())
-  curriculoId  Int
-  disciplinaId Int
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  curriculoId  String        @db.Uuid
+  disciplinaId String        @db.Uuid
   obrigatoria  Boolean
   semestre     Int
 
@@ -145,7 +145,7 @@ model CurriculoDisciplina {
 }
 
 model Disciplina {
-  id             Int    @id @default(autoincrement())
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   nome           String
   numeroCreditos Int
   cargaHoraria   Int
@@ -155,12 +155,12 @@ model Disciplina {
 }
 
 model Turma {
-  id            Int        @id @default(autoincrement())
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   nome          String
-  vagas         Int        @default(40)
-  cursoId       Int
-  disciplinaId  Int
-  ministranteId Int?
+  vagas         Int         @default(40)
+  cursoId       String      @db.Uuid
+  disciplinaId  String      @db.Uuid
+  ministranteId String?     @db.Uuid
 
   curso         Curso      @relation(fields: [cursoId], references: [id])
   disciplina    Disciplina @relation(fields: [disciplinaId], references: [id])
@@ -172,20 +172,20 @@ model Turma {
 }
 
 model TurmaAluno {
-  id      Int     @id @default(autoincrement())
-  turmaId Int
-  alunoId Int
+  id      String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  turmaId String      @db.Uuid
+  alunoId String      @db.Uuid
 
-  turma   Turma   @relation(fields: [turmaId], references: [id])
-  aluno   Usuario @relation(fields: [alunoId], references: [id])
+  turma   Turma       @relation(fields: [turmaId], references: [id])
+  aluno   Usuario     @relation(fields: [alunoId], references: [id])
 
   @@unique([turmaId, alunoId])
 }
 
 model TurmaHorario {
-  id        Int     @id @default(autoincrement())
-  turmaId   Int
-  horarioId Int
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  turmaId   String      @db.Uuid
+  horarioId String      @db.Uuid
 
   turma     Turma   @relation(fields: [turmaId], references: [id])
   horario   Horario @relation(fields: [horarioId], references: [id])
@@ -194,7 +194,7 @@ model TurmaHorario {
 }
 
 model Horario {
-  id           Int      @id @default(autoincrement())
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   nome         String
   horaInicio   DateTime @db.Time
   horaFim      DateTime @db.Time
@@ -204,17 +204,18 @@ model Horario {
 }
 
 model Reserva {
-  id            Int          @id @default(autoincrement())
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tipoReserva   TipoReserva
   tipoEvento    TipoEvento
+  diaSemana     Int
   dataInicio    DateTime     @db.Date
   dataFim       DateTime     @db.Date
-  horarioId     Int
-  salaId        Int
-  turmaId       Int?
-  ministranteId Int
-  solicitanteId Int
-  aprovadorId   Int
+  horarioId     String       @db.Uuid
+  salaId        String       @db.Uuid
+  turmaId       String?      @db.Uuid
+  ministranteId String       @db.Uuid
+  solicitanteId String       @db.Uuid
+  aprovadorId   String       @db.Uuid
 
   horario       Horario      @relation(fields: [horarioId], references: [id])
   sala          Sala         @relation(fields: [salaId], references: [id])

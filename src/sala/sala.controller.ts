@@ -15,29 +15,31 @@ export class SalaController {
 
   @Get()
   findAll() {
-    console.log("findAll")
     return this.salaService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    console.log("findOne")
-    return this.salaService.findOne(+id);
+    return this.salaService.findOne(id);
   }
 
   @Get('bySetor/:id')
   findBySetor(@Param('id') id: string) {
-    console.log("findOne")
-    return this.salaService.findOne(+id);
+    return this.salaService.findBySetor(id);
+  }
+
+  @Get('byBloco/:id')
+  findByBloco(@Param('id') id: string) {
+    return this.salaService.findByBloco(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSalaDto: UpdateSalaDto) {
-    return this.salaService.update(+id, updateSalaDto);
+    return this.salaService.update(id, updateSalaDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.salaService.remove(+id);
+    return this.salaService.remove(id);
   }
 }

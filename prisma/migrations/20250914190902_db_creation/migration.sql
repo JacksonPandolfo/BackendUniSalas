@@ -5,68 +5,109 @@ CREATE TYPE "public"."StatusSala" AS ENUM ('LIVRE', 'OCUPADA', 'MANUTENCAO', 'DE
 CREATE TYPE "public"."Cargo" AS ENUM ('ADMINISTRADOR', 'ATENDIMENTO', 'MINISTRANTE', 'FUNCIONARIO');
 
 -- CreateEnum
-CREATE TYPE "public"."DiaSemana" AS ENUM ('SEGUNDA', 'TERCA', 'QUARTA', 'QUINTA', 'SEXTA', 'SABADO', 'DOMINGO');
-
--- CreateEnum
 CREATE TYPE "public"."TipoReserva" AS ENUM ('ESPORADICA', 'RECORRENTE');
 
 -- CreateEnum
-CREATE TYPE "public"."TipoEvento" AS ENUM ('AULA', 'PALESTRA', 'BANCA', 'REUNIAO');
+CREATE TYPE "public"."TipoEvento" AS ENUM ('AULA', 'PALESTRA', 'BANCA', 'REUNIAO', 'EVENTO');
+
+-- CreateEnum
+CREATE TYPE "public"."TipoMobiliario" AS ENUM ('MESADESENHO', 'CADEIRABRACO', 'MESAREUNIAO', 'MOBILIARIOMOVEL');
+
+-- CreateEnum
+CREATE TYPE "public"."TipoEquipamento" AS ENUM ('CAIXASOM', 'PROJETOR', 'COMPUTADOR', 'MICROFONE', 'WEBCAM');
 
 -- CreateTable
 CREATE TABLE "public"."Usuario" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "nome" TEXT NOT NULL,
     "sobrenome" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "dataNascimento" TIMESTAMP(3) NOT NULL,
-    "cargos" "public"."Cargo" NOT NULL DEFAULT 'FUNCIONARIO',
+    "dataNascimento" DATE NOT NULL,
+    "senha" TEXT NOT NULL,
+    "cargos" "public"."Cargo"[],
 
     CONSTRAINT "Usuario_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
+CREATE TABLE "public"."Setor" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "nome" TEXT NOT NULL,
+    "descricao" TEXT NOT NULL,
+
+    CONSTRAINT "Setor_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."Bloco" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "numero" INTEGER NOT NULL,
-    "setorId" INTEGER NOT NULL,
+    "setorId" UUID NOT NULL,
 
     CONSTRAINT "Bloco_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Sala" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "numero" INTEGER NOT NULL,
-    "statusSala" "public"."StatusSala" NOT NULL DEFAULT 'LIVRE',
     "temAcessibilidade" BOOLEAN NOT NULL,
     "capacidade" INTEGER NOT NULL,
-    "setorId" INTEGER NOT NULL,
-    "blocoId" INTEGER NOT NULL,
+    "blocoId" UUID NOT NULL,
+    "statusSala" "public"."StatusSala" NOT NULL DEFAULT 'LIVRE',
 
     CONSTRAINT "Sala_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
+CREATE TABLE "public"."SalaMobiliario" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "salaId" UUID NOT NULL,
+    "tipoMobiliario" "public"."TipoMobiliario" NOT NULL,
+
+    CONSTRAINT "SalaMobiliario_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."SalaEquipamento" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "salaId" UUID NOT NULL,
+    "tipoEquipamento" "public"."TipoEquipamento" NOT NULL,
+
+    CONSTRAINT "SalaEquipamento_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."Curso" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "nome" TEXT NOT NULL,
 
     CONSTRAINT "Curso_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "public"."CursoDisciplina" (
-    "id" SERIAL NOT NULL,
-    "cursoId" INTEGER NOT NULL,
-    "disciplinaId" INTEGER NOT NULL,
+CREATE TABLE "public"."Curriculo" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "versaoCurriculo" INTEGER NOT NULL,
+    "cursoId" UUID NOT NULL,
 
-    CONSTRAINT "CursoDisciplina_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Curriculo_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."CurriculoDisciplina" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "curriculoId" UUID NOT NULL,
+    "disciplinaId" UUID NOT NULL,
+    "obrigatoria" BOOLEAN NOT NULL,
+    "semestre" INTEGER NOT NULL,
+
+    CONSTRAINT "CurriculoDisciplina_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Disciplina" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "nome" TEXT NOT NULL,
     "numeroCreditos" INTEGER NOT NULL,
     "cargaHoraria" INTEGER NOT NULL,
@@ -76,57 +117,58 @@ CREATE TABLE "public"."Disciplina" (
 
 -- CreateTable
 CREATE TABLE "public"."Turma" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "nome" TEXT NOT NULL,
     "vagas" INTEGER NOT NULL DEFAULT 40,
-    "cursoId" INTEGER NOT NULL,
-    "disciplinaId" INTEGER NOT NULL,
-    "ministranteId" INTEGER,
+    "cursoId" UUID NOT NULL,
+    "disciplinaId" UUID NOT NULL,
+    "ministranteId" UUID,
 
     CONSTRAINT "Turma_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."TurmaAluno" (
-    "id" SERIAL NOT NULL,
-    "turmaId" INTEGER NOT NULL,
-    "alunoId" INTEGER NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "turmaId" UUID NOT NULL,
+    "alunoId" UUID NOT NULL,
 
     CONSTRAINT "TurmaAluno_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."TurmaHorario" (
-    "id" SERIAL NOT NULL,
-    "turmaId" INTEGER NOT NULL,
-    "horarioId" INTEGER NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "turmaId" UUID NOT NULL,
+    "horarioId" UUID NOT NULL,
 
     CONSTRAINT "TurmaHorario_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Horario" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "nome" TEXT NOT NULL,
-    "horaInicio" TIMESTAMP(3) NOT NULL,
-    "horaFim" TIMESTAMP(3) NOT NULL,
+    "horaInicio" TIME NOT NULL,
+    "horaFim" TIME NOT NULL,
 
     CONSTRAINT "Horario_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Reserva" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "tipoReserva" "public"."TipoReserva" NOT NULL,
     "tipoEvento" "public"."TipoEvento" NOT NULL,
-    "dataInicio" TIMESTAMP(3) NOT NULL,
-    "dataFim" TIMESTAMP(3) NOT NULL,
-    "diaSemana" "public"."DiaSemana",
-    "horarioId" INTEGER NOT NULL,
-    "salaId" INTEGER NOT NULL,
-    "turmaId" INTEGER,
-    "ministranteId" INTEGER NOT NULL,
-    "solicitanteId" INTEGER NOT NULL,
-    "aprovadorId" INTEGER NOT NULL,
+    "diaSemana" INTEGER NOT NULL,
+    "dataInicio" DATE NOT NULL,
+    "dataFim" DATE NOT NULL,
+    "horarioId" UUID NOT NULL,
+    "salaId" UUID NOT NULL,
+    "turmaId" UUID,
+    "ministranteId" UUID NOT NULL,
+    "solicitanteId" UUID NOT NULL,
+    "aprovadorId" UUID NOT NULL,
 
     CONSTRAINT "Reserva_pkey" PRIMARY KEY ("id")
 );
@@ -135,13 +177,16 @@ CREATE TABLE "public"."Reserva" (
 CREATE UNIQUE INDEX "Usuario_email_key" ON "public"."Usuario"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Setor_nome_key" ON "public"."Setor"("nome");
+
+-- CreateIndex
 CREATE INDEX "Sala_statusSala_idx" ON "public"."Sala"("statusSala");
 
 -- CreateIndex
-CREATE INDEX "Sala_setorId_blocoId_numero_idx" ON "public"."Sala"("setorId", "blocoId", "numero");
+CREATE INDEX "Sala_blocoId_numero_idx" ON "public"."Sala"("blocoId", "numero");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "CursoDisciplina_cursoId_disciplinaId_key" ON "public"."CursoDisciplina"("cursoId", "disciplinaId");
+CREATE UNIQUE INDEX "CurriculoDisciplina_curriculoId_disciplinaId_key" ON "public"."CurriculoDisciplina"("curriculoId", "disciplinaId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TurmaAluno_turmaId_alunoId_key" ON "public"."TurmaAluno"("turmaId", "alunoId");
@@ -153,16 +198,22 @@ CREATE UNIQUE INDEX "TurmaHorario_turmaId_horarioId_key" ON "public"."TurmaHorar
 ALTER TABLE "public"."Bloco" ADD CONSTRAINT "Bloco_setorId_fkey" FOREIGN KEY ("setorId") REFERENCES "public"."Setor"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."Sala" ADD CONSTRAINT "Sala_setorId_fkey" FOREIGN KEY ("setorId") REFERENCES "public"."Setor"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "public"."Sala" ADD CONSTRAINT "Sala_blocoId_fkey" FOREIGN KEY ("blocoId") REFERENCES "public"."Bloco"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."CursoDisciplina" ADD CONSTRAINT "CursoDisciplina_cursoId_fkey" FOREIGN KEY ("cursoId") REFERENCES "public"."Curso"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."SalaMobiliario" ADD CONSTRAINT "SalaMobiliario_salaId_fkey" FOREIGN KEY ("salaId") REFERENCES "public"."Sala"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."CursoDisciplina" ADD CONSTRAINT "CursoDisciplina_disciplinaId_fkey" FOREIGN KEY ("disciplinaId") REFERENCES "public"."Disciplina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."SalaEquipamento" ADD CONSTRAINT "SalaEquipamento_salaId_fkey" FOREIGN KEY ("salaId") REFERENCES "public"."Sala"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Curriculo" ADD CONSTRAINT "Curriculo_cursoId_fkey" FOREIGN KEY ("cursoId") REFERENCES "public"."Curso"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."CurriculoDisciplina" ADD CONSTRAINT "CurriculoDisciplina_curriculoId_fkey" FOREIGN KEY ("curriculoId") REFERENCES "public"."Curriculo"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."CurriculoDisciplina" ADD CONSTRAINT "CurriculoDisciplina_disciplinaId_fkey" FOREIGN KEY ("disciplinaId") REFERENCES "public"."Disciplina"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Turma" ADD CONSTRAINT "Turma_cursoId_fkey" FOREIGN KEY ("cursoId") REFERENCES "public"."Curso"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -17,20 +17,20 @@ export class SetorService {
     return this.prismaService.setor.findMany();
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return this.prismaService.setor.findUnique({
       where: { id },
     });
   }
 
-  update(id: number, updateSetorDto: UpdateSetorDto) {
+  update(id: string, updateSetorDto: UpdateSetorDto) {
     return this.prismaService.setor.update({
       where: { id },
       data: updateSetorDto,
     });
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.prismaService.setor.delete({
       where: { id },
     });

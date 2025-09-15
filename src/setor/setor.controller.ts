@@ -20,16 +20,16 @@ export class SetorController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.setorService.findOne(+id);
+    return this.setorService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSetorDto: UpdateSetorDto) {
-    return this.setorService.update(+id, updateSetorDto);
+    return this.setorService.update(id, updateSetorDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.setorService.remove(+id);
+    return this.setorService.remove(id);
   }
 }

@@ -19,23 +19,28 @@ export class ReservaController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reservaService.findOne(+id);
+  findMany(@Param('id') id: string) {
+    return this.reservaService.findMany(id);
   }
 
   @Get('byDate/:salaId/:dataInicio/:dataFim')
   findWithDate(@Param('salaId') salaId: string, @Param('dataInicio') dataInicio: string, @Param('dataFim') dataFim: string) {
-    return this.reservaService.findWithDate(+salaId, new Date(dataInicio), new Date(dataFim))
+    const inicioUTC = new Date(`${dataInicio}T00:00:00`);
+    const fimUTC = new Date(`${dataFim}T23:59:59`);
+
+    return this.reservaService.findWithDate(
+      salaId, inicioUTC, fimUTC
+    )
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateReservaDto: UpdateReservaDto) {
-    return this.reservaService.update(+id, updateReservaDto);
+    return this.reservaService.update(id, updateReservaDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.reservaService.remove(+id);
+    return this.reservaService.remove(id);
   }
 }
 

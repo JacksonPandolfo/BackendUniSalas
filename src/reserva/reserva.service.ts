@@ -18,23 +18,34 @@ export class ReservaService {
     return this.prismaService.reserva.findMany();
   }
 
-  findOne(id: number) {
-    return this.prismaService.reserva.findUnique({
-      where: {id}
+  findMany(id: string) {
+    return this.prismaService.reserva.findMany({
+      where: {salaId: id},
+      include: {
+        sala: true,
+        horario: true,
+        turma: {select:
+          {id: true, nome: true, cursoId: true, disciplinaId: true,
+            curso: {select: {id: true, nome: true}},
+            disciplina: {select: {id: true, nome: true}}
+          }},
+        ministrante: { select: {id: true, nome: true}}
+      }
     })
   }
 
-  findWithDate(salaId: number, dataInicio: Date, dataFim: Date) {
+  findWithDate(salaId: string, dataInicio: Date, dataFim: Date) {
     const inicioUTC = new Date(Date.UTC(
-      dataInicio.getUTCFullYear(),
-      dataInicio.getUTCMonth(),
-      dataInicio.getUTCDate(), 0, 0, 0, 0
+      dataInicio.getFullYear(),
+      dataInicio.getMonth(),
+      dataInicio.getDate()
+      // getUTCDate(), 0, 0, 0, 0
     ));
-
     const fimUTC = new Date(Date.UTC(
-      dataFim.getUTCFullYear(),
-      dataFim.getUTCMonth(),
-      dataFim.getUTCDate(), 23, 59, 59, 999
+      dataFim.getFullYear(),
+      dataFim.getMonth(),
+      dataFim.getDate()
+      // , 23, 59, 59, 999
     ));
 
     return this.prismaService.reserva.findMany({
@@ -48,20 +59,24 @@ export class ReservaService {
       include: {
         sala: true,
         horario: true,
-        turma: {select: {id: true, nome: true}},
+        turma: {select:
+          {id: true, nome: true, cursoId: true, disciplinaId: true,
+            curso: {select: {id: true, nome: true}},
+            disciplina: {select: {id: true, nome: true}}
+          }},
         ministrante: { select: {id: true, nome: true}}
       }
     })
   }
 
-  update(id: number, updateReservaDto: UpdateReservaDto) {
+  update(id: string, updateReservaDto: UpdateReservaDto) {
     return this.prismaService.reserva.update({
       where: {id},
       data: updateReservaDto
     })
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.prismaService.reserva.delete({
       where: {id}
     })

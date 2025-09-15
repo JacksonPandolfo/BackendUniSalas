@@ -19,18 +19,18 @@ export class BlocoController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.blocoService.findOne(+id);
+  findMany(@Param('id') id: string) {
+    return this.blocoService.findMany(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBlocoDto: UpdateBlocoDto) {
-    return this.blocoService.update(+id, updateBlocoDto);
+    return this.blocoService.update(id, updateBlocoDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.blocoService.remove(+id);
+    return this.blocoService.remove(id);
   }
 }
 

@@ -18,12 +18,18 @@ export class SalaService {
     return this.prismaService.sala.findMany({
       include: {
         Mobiliarios: true,
-        Equipamentos: true
+        Equipamentos: true,
+        bloco: {
+          select: {
+            numero: true,
+            setor: {
+              select: {
+                nome: true}}}}
       }
     })
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return this.prismaService.sala.findUnique({
       where: {id},
       include: {
@@ -33,10 +39,10 @@ export class SalaService {
     })
   }
 
-  findBySetor(setorid: number) {
+  findBySetor(setorId: string) {
     return this.prismaService.sala.findMany({
       where: {
-        bloco: { setorId: setorid }
+        bloco: { setorId: setorId }
       },
       include: {
         Mobiliarios: true,
@@ -46,14 +52,27 @@ export class SalaService {
     })
   }
 
-  update(id: number, updateSalaDto: UpdateSalaDto) {
+  findByBloco(blocoId: string) {
+    return this.prismaService.sala.findMany({
+      where: {
+        blocoId: blocoId
+      },
+      include: {
+        Mobiliarios: true,
+        Equipamentos: true,
+        bloco: true
+      }
+    })
+  }
+
+  update(id: string, updateSalaDto: UpdateSalaDto) {
     return this.prismaService.sala.update({
       where: {id},
       data: updateSalaDto
     })
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.prismaService.sala.delete({
       where: {id}
     })
