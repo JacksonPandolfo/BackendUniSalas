@@ -39,13 +39,11 @@ export class ReservaService {
       dataInicio.getFullYear(),
       dataInicio.getMonth(),
       dataInicio.getDate()
-      // getUTCDate(), 0, 0, 0, 0
     ));
     const fimUTC = new Date(Date.UTC(
       dataFim.getFullYear(),
       dataFim.getMonth(),
       dataFim.getDate()
-      // , 23, 59, 59, 999
     ));
 
     return this.prismaService.reserva.findMany({
