@@ -18,9 +18,15 @@ export class ReservaService {
     return this.prismaService.reserva.findMany();
   }
 
-  findMany(id: string) {
+  findUnique(id: string) {
+    return this.prismaService.reserva.findUnique({
+      where: {id: id}
+    })
+  }
+
+  findManyBySala(salaId: string) {
     return this.prismaService.reserva.findMany({
-      where: {salaId: id},
+      where: {salaId: salaId},
       include: {
         sala: true,
         horario: true,

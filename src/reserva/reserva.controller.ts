@@ -19,8 +19,13 @@ export class ReservaController {
   }
 
   @Get(':id')
-  findMany(@Param('id') id: string) {
-    return this.reservaService.findMany(id);
+  findUnique(@Param('id') id: string) {
+    return this.reservaService.findUnique(id);
+  }
+
+  @Get('bySala/:id')
+  findManyBySala(@Param('id') salaId: string) {
+    return this.reservaService.findManyBySala(salaId);
   }
 
   @Get('byDate/:salaId/:dataInicio/:dataFim')
