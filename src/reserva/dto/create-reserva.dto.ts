@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { TipoEvento, TipoReserva } from "generated/prisma"
 
-export class CreateReservaDto {
+export interface CreateReservaDto {
     id: string
     tipoReserva: TipoReserva
     tipoEvento: TipoEvento

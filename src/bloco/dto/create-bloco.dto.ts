@@ -1,4 +1,4 @@
-export class CreateBlocoDto {
+export interface CreateBlocoDto {
   numero: number;
   setorId: string;
 }

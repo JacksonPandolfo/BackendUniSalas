@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { StatusSala, TipoEquipamento, TipoMobiliario } from "generated/prisma";
 
-export class CreateSalaDto {
+export interface CreateSalaDto {
     numero: number;
     statusSala: StatusSala;
     temAcessibilidade: boolean;
