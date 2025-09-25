@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access  */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable prettier/prettier */
 import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
-import { ExtractJwt, JwtFromRequestFunction, Strategy } from 'passport-jwt';
+import { Request } from "express";
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from "src/types/jwt-payload.interface";
+// JwtFromRequestFunction
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -14,15 +13,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         if (!jwtSecret) {
             throw new Error("JWT_SECRET não definido")
         }
-        const jwtFromRequest: JwtFromRequestFunction = ExtractJwt.fromAuthHeaderAsBearerToken();
+        // const jwtFromRequest: JwtFromRequestFunction = ExtractJwt.fromAuthHeaderAsBearerToken();
         super({
-            jwtFromRequest,
-            ignoreExpiration: false,
-            secretOrKey: jwtSecret
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                (req: Request): string | null => {
+                    const cookies = req.cookies as Record<string, string> | undefined
+                    const token = cookies?.['jwt']
+                    return typeof token === 'string' ? token : null
+                },
+            ]),
+                ignoreExpiration: false,
+                secretOrKey: jwtSecret
         })
     }
 
-    validate(payload: JwtPayload){
-        return { userId: payload.sub, email: payload.email, roles: payload.roles }
+    validate(payload: JwtPayload): JwtPayload{
+        return payload
     }
 }

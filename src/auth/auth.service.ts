@@ -25,7 +25,7 @@ export class AuthService {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { senha, ...result } = usuario
-    const payload = {sub: usuario.id, email: usuario.email, Cargo: usuario.cargos}
+    const payload = {sub: usuario.id, email: usuario.email, roles: usuario.cargos}
     const token = await this.jwtService.signAsync(payload)
     return {
         access_token: token

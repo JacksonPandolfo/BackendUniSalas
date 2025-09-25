@@ -1,10 +1,15 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ReservaService } from './reserva.service';
 import type { CreateReservaDto } from './dto/create-reserva.dto';
 import type { UpdateReservaDto } from './dto/update-reserva.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Cargo } from 'generated/prisma';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('reserva')
+@UseGuards(JwtAuthGuard)
 export class ReservaController {
   constructor(private readonly reservaService: ReservaService) {}
 
@@ -44,6 +49,8 @@ export class ReservaController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)   // Chama guard de cargos para a validação
+  @Roles(Cargo.ADMINISTRADOR) // só aceita o delete se for administrador
   remove(@Param('id') id: string) {
     return this.reservaService.remove(id);
   }

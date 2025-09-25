@@ -1,10 +1,15 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { SalaService } from './sala.service';
 import type { CreateSalaDto } from './dto/create-sala.dto';
 import type { UpdateSalaDto } from './dto/update-sala.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Cargo } from 'generated/prisma';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('sala')
+@UseGuards(JwtAuthGuard)
 export class SalaController {
   constructor(private readonly salaService: SalaService) {}
 
@@ -39,6 +44,8 @@ export class SalaController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)   // Chama guard de cargos para a validação
+  @Roles(Cargo.ADMINISTRADOR) // só aceita o delete se for administrador
   remove(@Param('id') id: string) {
     return this.salaService.remove(id);
   }
