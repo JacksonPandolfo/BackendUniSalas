@@ -24,8 +24,13 @@ export class BlocoController {
   }
 
   @Get(':id')
-  findMany(@Param('id') id: string) {
-    return this.blocoService.findMany(id);
+  findUnique(@Param('id') id: string) {
+    return this.blocoService.findUnique(id);
+  }
+
+  @Get('bySetor/:id')
+  findManyBySetor(@Param('id') id: string) {
+    return this.blocoService.findManyBySetor(id);
   }
 
   @Patch(':id')

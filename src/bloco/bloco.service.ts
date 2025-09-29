@@ -18,13 +18,20 @@ export class BlocoService {
     return this.prismaService.bloco.findMany();
   }
 
-  findMany(id: string) {
+  findUnique(id: string) {
+    return this.prismaService.bloco.findUnique({
+      where: {id: id}
+    })
+  }
+
+  findManyBySetor(id: string) {
     return this.prismaService.bloco.findMany({
       where: {setorId: id}
     })
   }
 
   update(id: string, updateBlocoDto: UpdateBlocoDto) {
+    console.log(updateBlocoDto)
     return this.prismaService.bloco.update({
       where: {id},
       data: updateBlocoDto

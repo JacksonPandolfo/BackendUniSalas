@@ -33,6 +33,9 @@ export class SalaService {
     return this.prismaService.sala.findUnique({
       where: {id},
       include: {
+        bloco: {include: {
+          setor: true
+        }},
         Mobiliarios: true,
         Equipamentos: true
       }
