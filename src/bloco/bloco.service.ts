@@ -26,7 +26,10 @@ export class BlocoService {
 
   findManyBySetor(id: string) {
     return this.prismaService.bloco.findMany({
-      where: {setorId: id}
+      where: {setorId: id},
+      include: {
+        salas: true
+      }
     })
   }
 
