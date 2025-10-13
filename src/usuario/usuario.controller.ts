@@ -11,6 +11,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { Cargo } from 'generated/prisma';
 
 @Controller('usuario')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
@@ -18,28 +19,40 @@ export class UsuarioController {
   create(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuarioService.create(createUsuarioDto);
   }
-  @UseGuards(JwtAuthGuard)
+
   @Get()
   findAll() {
     return this.usuarioService.findAll();
   }
-  @UseGuards(JwtAuthGuard)
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usuarioService.findOne(id);
   }
-  @UseGuards(JwtAuthGuard)
+
+  @Get('byNome/:nome')
+  findMany(@Param('nome') nome: string) {
+    return this.usuarioService.findManyByNome(nome);
+  }
+
+  @Get('byCargo/:nome')
+  findMinistranteByNome(@Param('nome') nome: string) {
+    return this.usuarioService.findMinistranteByNome(nome);
+  }
+
   @Get('me')
   getProfile(@Req() req: Request & { usuario: JwtPayload }) {
     const { sub, email, roles } = req.usuario
     return { id: sub, email, roles } // Esse "user" veio do payload do JWT (JwtStrategy)
   }
-  @UseGuards(JwtAuthGuard)
+
   @Patch(':id')
+  @UseGuards(RolesGuard)   // Chama guard de cargos para a validação
+  @Roles(Cargo.ADMINISTRADOR) // só aceita o delete se for administrador
   update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
     return this.usuarioService.update(id, updateUsuarioDto);
   }
-  @UseGuards(JwtAuthGuard)
+
   @Delete(':id')
   @UseGuards(RolesGuard)   // Chama guard de cargos para a validação
   @Roles(Cargo.ADMINISTRADOR) // só aceita o delete se for administrador

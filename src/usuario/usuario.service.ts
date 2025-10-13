@@ -4,6 +4,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { PrismaService } from 'src/db/prisma.service';
 import * as bcrypt from 'bcrypt'
+import { Cargo } from 'generated/prisma';
 
 @Injectable()
 export class UsuarioService {
@@ -71,6 +72,28 @@ export class UsuarioService {
     return this.prismaService.usuario.findUnique({
       where: { id }
     });
+  }
+
+  findManyByNome(nome: string) {
+    return this.prismaService.usuario.findMany({
+      where: {nome: {contains: nome, mode: 'insensitive'}}
+    })
+  }
+
+  findMinistranteByNome(nome: string) {
+    return this.prismaService.usuario.findMany({
+      where: {
+        AND: [
+          { cargos: { has: Cargo.MINISTRANTE } },
+          {
+            OR: [
+              { nome: { contains: nome, mode: "insensitive" } },
+              { sobrenome: { contains: nome, mode: "insensitive" } }
+            ]
+          }
+        ]
+      }
+    })
   }
 
   update(id: string, updateUsuarioDto: UpdateUsuarioDto) {

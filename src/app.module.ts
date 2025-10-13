@@ -6,6 +6,9 @@ import { SalaModule } from './sala/sala.module';
 import { ReservaModule } from './reserva/reserva.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
+import { DisciplinaModule } from './disciplina/disciplina.module';
+import { TurmaModule } from './turma/turma.module';
+import { HorarioModule } from './horario/horario.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { AuthModule } from './auth/auth.module';
     ReservaModule,
     UsuarioModule,
     AuthModule,
+    DisciplinaModule,
+    TurmaModule,
+    HorarioModule,
   ],
   controllers: [],
   providers: [],

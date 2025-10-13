@@ -55,6 +55,7 @@ model Usuario {
   nome           String
   sobrenome      String
   email          String   @unique
+  telefone       String   @default("(xx)xxxxx-xxxx")
   dataNascimento DateTime @db.Date
   senha          String
   cargos         Cargo[]

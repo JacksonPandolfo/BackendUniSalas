@@ -2,7 +2,6 @@
 import { TipoEvento, TipoReserva } from "generated/prisma"
 
 export interface CreateReservaDto {
-    id: string
     tipoReserva: TipoReserva
     tipoEvento: TipoEvento
     diaSemana: number
