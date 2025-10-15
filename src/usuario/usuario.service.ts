@@ -75,8 +75,15 @@ export class UsuarioService {
   }
 
   findManyByNome(nome: string) {
+    console.log("oiii: " + nome)
     return this.prismaService.usuario.findMany({
-      where: {nome: {contains: nome, mode: 'insensitive'}}
+      where: {
+        OR: [
+          { nome: { contains: nome, mode: 'insensitive' } },
+          { sobrenome: {  contains: nome, mode: 'insensitive' } }
+
+        ]
+      }
     })
   }
 

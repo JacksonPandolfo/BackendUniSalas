@@ -212,6 +212,8 @@ model Reserva {
   dataInicio    DateTime    @db.Date
   dataFim       DateTime    @db.Date
   horarioId     String      @db.Uuid
+  horaInicial   DateTime?   @db.Time
+  horaFinal     DateTime?   @db.Time
   salaId        String      @db.Uuid
   turmaId       String?     @db.Uuid
   ministranteId String      @db.Uuid
