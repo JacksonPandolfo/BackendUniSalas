@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum StatusReserva {
+  APROVADA
+  PENDENTE
+  CANCELADA
+}
+
 enum StatusSala {
   LIVRE //Sala livre (Sem reserva)
   OCUPADA //Sala ocupada (Com reserva)
@@ -205,23 +211,29 @@ model Horario {
 }
 
 model Reserva {
-  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tipoReserva   TipoReserva
-  tipoEvento    TipoEvento
-  diaSemana     Int
-  dataInicio    DateTime    @db.Date
-  dataFim       DateTime    @db.Date
-  horarioId     String      @db.Uuid
-  horaInicial   DateTime?   @db.Time
-  horaFinal     DateTime?   @db.Time
-  salaId        String      @db.Uuid
-  turmaId       String?     @db.Uuid
-  ministranteId String      @db.Uuid
-  solicitanteId String      @db.Uuid
-  aprovadorId   String      @db.Uuid
+  id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tipoReserva      TipoReserva
+  tipoEvento       TipoEvento
+  acessibilidade   Boolean
+  diaSemana        Int
+  dataInicio       DateTime    @db.Date
+  dataFim          DateTime    @db.Date
+  horarioId        String?     @db.Uuid
+  horaInicial      DateTime    @db.Time
+  horaFinal        DateTime    @db.Time
+  salaId           String?     @db.Uuid
+  turmaId          String?     @db.Uuid
+  qtdPessoas       Int
+  ministranteId    String      @db.Uuid
+  solicitanteId    String      @db.Uuid
+  aprovadorId      String      @db.Uuid
+  statusReserva    StatusReserva
+  equipamentos     TipoEquipamento[]
+  mobiliarios      TipoMobiliario[]
+  setorPreferidoId String?
 
-  horario     Horario @relation(fields: [horarioId], references: [id])
-  sala        Sala    @relation(fields: [salaId], references: [id])
+  horario     Horario? @relation(fields: [horarioId], references: [id])
+  sala        Sala?    @relation(fields: [salaId], references: [id])
   turma       Turma?  @relation(fields: [turmaId], references: [id])
   ministrante Usuario @relation("ReservaMinistrante", fields: [ministranteId], references: [id])
   solicitante Usuario @relation("ReservaSolicitante", fields: [solicitanteId], references: [id])

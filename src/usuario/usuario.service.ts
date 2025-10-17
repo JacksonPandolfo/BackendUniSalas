@@ -75,7 +75,6 @@ export class UsuarioService {
   }
 
   findManyByNome(nome: string) {
-    console.log("oiii: " + nome)
     return this.prismaService.usuario.findMany({
       where: {
         OR: [

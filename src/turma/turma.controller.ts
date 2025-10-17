@@ -28,6 +28,11 @@ export class TurmaController {
     return this.turmaService.findOne(id);
   }
 
+  @Get("/byMinistrante/:id")
+  findMany(@Param('id') id: string){
+    return this.turmaService.findManyByMinistrante(id)
+  }
+
   @Patch(':id')
   @UseGuards(RolesGuard)   // Chama guard de cargos para a validação
   @Roles(Cargo.ADMINISTRADOR) // só aceita o delete se for administrador

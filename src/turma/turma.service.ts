@@ -20,8 +20,19 @@ export class TurmaService {
 
   findOne(id: string) {
     return this.prismaService.turma.findUnique({
-      where: {id: id}
+      where: {id: id},
     });
+  }
+
+  findManyByMinistrante(id: string){
+    return this.prismaService.turma.findMany({
+      where: {ministranteId: id},
+      include: {
+        ministrante: true,
+        disciplina: true,
+        curso: true
+      }
+    })
   }
 
   update(id: string, updateTurmaDto: UpdateTurmaDto) {
