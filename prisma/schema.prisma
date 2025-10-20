@@ -61,7 +61,7 @@ model Usuario {
   nome           String
   sobrenome      String
   email          String   @unique
-  telefone       String   @default("(xx)xxxxx-xxxx")
+  telefone       String   
   dataNascimento DateTime @db.Date
   senha          String
   cargos         Cargo[]
@@ -214,7 +214,7 @@ model Reserva {
   id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tipoReserva      TipoReserva
   tipoEvento       TipoEvento
-  acessibilidade   Boolean
+  acessibilidade   Boolean     @default(false)
   diaSemana        Int
   dataInicio       DateTime    @db.Date
   dataFim          DateTime    @db.Date

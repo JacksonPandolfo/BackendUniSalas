@@ -38,17 +38,24 @@ export class UsuarioService {
   async create(createUsuarioDto: CreateUsuarioDto) {
     try {
       const senhaHash = await this.hashString(createUsuarioDto.senha)
-      return await this.prismaService.usuario.create({
+      const usuario = await this.prismaService.usuario.create({
         data: {
           nome: createUsuarioDto.nome,
           sobrenome: createUsuarioDto.sobrenome,
           dataNascimento: createUsuarioDto.dataNascimento,
+          telefone: createUsuarioDto.telefone,
           cargos: { set: createUsuarioDto.cargos },
           email:  createUsuarioDto.email,
           senha: senhaHash
         }
       }
     );
+    return {"message": "Usuário cadastrado com sucesso",
+      "usuario": {
+        "nome": usuario.nome,
+        "email": usuario.email
+      }
+    }
     } catch (error: unknown) {
       if(this.isPrismaUniqueConstraintError(error, 'email')){
         throw new ConflictException("Este email já está em uso")

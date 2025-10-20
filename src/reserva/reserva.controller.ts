@@ -15,6 +15,7 @@ export class ReservaController {
 
   @Post()
   create(@Body() createReservaDto: CreateReservaDto) {
+    console.log(createReservaDto)
     return this.reservaService.create(createReservaDto);
   }
 

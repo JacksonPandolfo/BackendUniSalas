@@ -5,7 +5,8 @@ export interface CreateUsuarioDto {
     nome: string,
     sobrenome: string,
     dataNascimento: Date,
-    cargos: Cargo[];
+    telefone: string,
+    cargos: Cargo[],
     email: string,
     senha: string
 }

@@ -9,6 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { DisciplinaModule } from './disciplina/disciplina.module';
 import { TurmaModule } from './turma/turma.module';
 import { HorarioModule } from './horario/horario.module';
+import { SalaMobiliarioModule } from './sala-mobiliario/sala-mobiliario.module';
+import { SalaEquipamentoModule } from './sala-equipamento/sala-equipamento.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { HorarioModule } from './horario/horario.module';
     DisciplinaModule,
     TurmaModule,
     HorarioModule,
+    SalaMobiliarioModule,
+    SalaEquipamentoModule,
   ],
   controllers: [],
   providers: [],
