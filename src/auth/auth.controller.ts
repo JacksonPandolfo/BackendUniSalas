@@ -15,8 +15,7 @@ export class AuthController {
         @Body('senha') senha: string,
         @Res({ passthrough: true }) res: express.Response
     ) {
-        const { access_token } = await this.authService.login(email, senha)
-
+        const { access_token, user } = await this.authService.login(email, senha)
         res.cookie('jwt', access_token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -25,6 +24,20 @@ export class AuthController {
             sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
         })
 
-        return { message: "Login realizado com sucesso"}
+        return { message: "Login realizado com sucesso", user: user}
+    }
+
+    @Post('logout')
+    logout(@Res({ passthrough: true }) res: express.Response){
+        res.clearCookie('jwt', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            path: '/',
+            expires: new Date(0),
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+        })
+        console.log('🧠 Set-Cookie enviado:', res.getHeaders()['set-cookie']);
+
+        return { message: "Logout realizado com sucesso" };
     }
 }
