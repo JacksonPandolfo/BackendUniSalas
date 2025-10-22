@@ -15,7 +15,6 @@ export class ReservaController {
 
   @Post()
   create(@Body() createReservaDto: CreateReservaDto) {
-    console.log(createReservaDto)
     return this.reservaService.create(createReservaDto);
   }
 
@@ -32,6 +31,11 @@ export class ReservaController {
   @Get('bySala/:id')
   findManyBySala(@Param('id') salaId: string) {
     return this.reservaService.findManyBySala(salaId);
+  }
+
+  @Get('byUsuario/:id')
+  findManyByUsuario(@Param('id') usuarioId: string) {
+    return this.reservaService.findManyByUsuario(usuarioId);
   }
 
   @Get('byDate/:salaId/:dataInicio/:dataFim')

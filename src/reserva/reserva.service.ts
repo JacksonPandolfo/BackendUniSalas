@@ -40,6 +40,30 @@ export class ReservaService {
     })
   }
 
+  findManyByUsuario(usuarioId: string) {
+    return this.prismaService.reserva.findMany({
+      where: {
+        OR: [
+          {solicitanteId: usuarioId},
+          {ministranteId: usuarioId},
+          {aprovadorId: usuarioId}
+        ]
+      },
+      include: {
+        sala: true,
+        horario: true,
+        turma: { select: { disciplina:
+            { select: { id: true, nome: true }}
+          }
+        },
+        solicitante: { select: {id: true, nome: true, sobrenome: true, cargos: true}},
+        ministrante: { select: {id: true, nome: true, sobrenome: true, cargos: true}},
+        aprovador: { select: {id: true, nome: true, sobrenome: true, cargos: true}}
+      },
+      orderBy: {dataInicio: "desc"}
+    })
+  }
+
   findWithDate(salaId: string, dataInicio: Date, dataFim: Date) {
     const inicioUTC = new Date(Date.UTC(
       dataInicio.getFullYear(),

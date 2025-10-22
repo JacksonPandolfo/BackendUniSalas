@@ -36,7 +36,6 @@ export class AuthController {
             expires: new Date(0),
             sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
         })
-        console.log('🧠 Set-Cookie enviado:', res.getHeaders()['set-cookie']);
 
         return { message: "Logout realizado com sucesso" };
     }
