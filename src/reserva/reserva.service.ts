@@ -45,7 +45,7 @@ export class ReservaService {
       where: {
         OR: [
           {solicitanteId: usuarioId},
-          {ministranteId: usuarioId},
+          // {ministranteId: usuarioId},
           {aprovadorId: usuarioId}
         ]
       },
