@@ -61,7 +61,7 @@ model Usuario {
   nome           String
   sobrenome      String
   email          String   @unique
-  telefone       String   
+  telefone       String
   dataNascimento DateTime @db.Date
   senha          String
   cargos         Cargo[]
@@ -78,6 +78,8 @@ model Setor {
   nome      String  @unique
   descricao String
   blocos    Bloco[]
+
+  Reserva Reserva[] @relation("ReservaSetor")
 }
 
 model Bloco {
@@ -230,7 +232,7 @@ model Reserva {
   statusReserva    StatusReserva
   equipamentos     TipoEquipamento[]
   mobiliarios      TipoMobiliario[]
-  setorPreferidoId String?
+  setorPreferidoId String?     @db.Uuid
 
   horario     Horario? @relation(fields: [horarioId], references: [id])
   sala        Sala?    @relation(fields: [salaId], references: [id])
@@ -238,4 +240,5 @@ model Reserva {
   ministrante Usuario @relation("ReservaMinistrante", fields: [ministranteId], references: [id])
   solicitante Usuario @relation("ReservaSolicitante", fields: [solicitanteId], references: [id])
   aprovador   Usuario @relation("ReservaAprovador", fields: [aprovadorId], references: [id])
+  setor       Setor?   @relation("ReservaSetor", fields: [setorPreferidoId], references: [id])
 }

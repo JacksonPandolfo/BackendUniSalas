@@ -58,7 +58,8 @@ export class ReservaService {
         },
         solicitante: { select: {id: true, nome: true, sobrenome: true, cargos: true}},
         ministrante: { select: {id: true, nome: true, sobrenome: true, cargos: true}},
-        aprovador: { select: {id: true, nome: true, sobrenome: true, cargos: true}}
+        aprovador: { select: {id: true, nome: true, sobrenome: true, cargos: true}},
+        setor: { select: { nome: true, descricao: true}}
       },
       orderBy: {dataInicio: "desc"}
     })

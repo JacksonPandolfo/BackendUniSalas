@@ -38,6 +38,13 @@ export class SalaController {
     return this.salaService.findByBloco(id);
   }
 
+  @Get('bySolicitacao/:id')
+  async findBySolicitacaoReserva(@Param('id') id: string){
+    const res = await this.salaService.findBySolicitacaoReserva(id)
+    console.log(res)
+    return res
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSalaDto: UpdateSalaDto) {
     return this.salaService.update(id, updateSalaDto);
