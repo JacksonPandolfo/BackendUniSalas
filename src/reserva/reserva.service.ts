@@ -50,7 +50,7 @@ export class ReservaService {
         ]
       },
       include: {
-        sala: true,
+        sala: { select: {numero: true, capacidade: true, bloco: {select: {numero: true, setor: {select: {nome: true}}}}}},
         horario: true,
         turma: { select: { disciplina:
             { select: { id: true, nome: true }}
@@ -81,6 +81,7 @@ export class ReservaService {
       where: {
         salaId,
         AND:[
+          { statusReserva: 'APROVADA'},
           { dataInicio: { gte: inicioUTC }},
           { dataFim: { lte: fimUTC }}
         ]

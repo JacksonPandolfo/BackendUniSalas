@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -78,9 +79,9 @@ export class SalaService {
 
     if(!reserva) throw new NotFoundException('Reserva não encontrada')
 
-    const where: any = {
+    const wherePrincipal: any = {
       capacidade: { gte: reserva.qtdPessoas },
-      temAcessibilidade: reserva.acessibilidade ? true : undefined,
+      temAcessibilidade: reserva.acessibilidade === true ? true : undefined,
       bloco: reserva.setorPreferidoId
         ? { setorId: reserva.setorPreferidoId }
         : undefined,
@@ -97,89 +98,85 @@ export class SalaService {
       },
     };
 
-  if (reserva.equipamentos?.length > 0) {
-    where.AND ??= [];
-    where.AND.push({
-      Equipamentos: {
-        some: {
-          tipoEquipamento: { in: reserva.equipamentos },
+    if (reserva.equipamentos?.length > 0) {
+      wherePrincipal.AND ??= [];
+      wherePrincipal.AND.push({
+        Equipamentos: {
+          some: {
+            tipoEquipamento: { in: reserva.equipamentos },
+          },
         },
+      });
+    }
+
+    if (reserva.mobiliarios?.length > 0) {
+      wherePrincipal.AND ??= [];
+      wherePrincipal.AND.push({
+        Mobiliarios: {
+          some: {
+            tipoMobiliario: { in: reserva.mobiliarios },
+          },
+        },
+      });
+    }
+
+    let salas = await this.prismaService.sala.findMany({
+      where: wherePrincipal,
+      include: {
+        bloco: {
+          select: {
+            numero: true,
+            setor: { select: { id: true, nome: true, descricao: true } },
+          },
+        },
+        Equipamentos: true,
+        Mobiliarios: true,
       },
     });
-  }
 
-  if (reserva.mobiliarios?.length > 0) {
-    where.AND ??= [];
-    where.AND.push({
-      Mobiliarios: {
-        some: {
-          tipoMobiliario: { in: reserva.mobiliarios },
+    if(salas.length === 0 && reserva.setorPreferidoId) {
+      const { bloco, ...wherePrincipalSemBloco} = wherePrincipal
+      // const whereAlternativo = {
+      //     ...wherePrincipal,
+      // }
+      salas = await this.prismaService.sala.findMany({
+        where: wherePrincipalSemBloco,
+        include: {
+          bloco: {
+            select: {
+              numero: true,
+              setor: { select: { id: true, nome: true, descricao: true } },
+            },
+          },
+          Equipamentos: true,
+          Mobiliarios: true,
         },
-      },
-    });
-  }
+      })
+    }
 
-  return this.prismaService.sala.findMany({
-    where,
-    include: {
-      bloco: {
-        select: {
-          numero: true,
-          setor: { select: { nome: true, descricao: true } },
+    if(salas.length === 0) {
+      const { bloco, capacidade, ...wherePrincipalSemBlocoSemCapacidade } = wherePrincipal
+      const whereCapacidadeFlex = {
+        ...wherePrincipalSemBlocoSemCapacidade,
+        capacidade: { gte: Math.ceil(reserva.qtdPessoas * 0.9) },
+      }
+      salas = await this.prismaService.sala.findMany({
+        where: whereCapacidadeFlex,
+        include: {
+          bloco: {
+            select: {
+              numero: true,
+              setor: { select: { id: true, nome: true, descricao: true } },
+            },
+          },
+          Equipamentos: true,
+          Mobiliarios: true,
         },
-      },
-      Equipamentos: true,
-      Mobiliarios: true,
-    },
-  });
-}
-
-  //   return this.prismaService.sala.findMany({
-  //     where: {
-  //       capacidade: { gte: reserva.qtdPessoas },
-  //       temAcessibilidade: reserva.acessibilidade ? true : undefined,
-  //       bloco: reserva.setorPreferidoId
-  //         ? { setorId: reserva.setorPreferidoId }
-  //         : undefined,
-
-  //       // status livre ou sem conflito de reserva
-  //       Reservas: {
-  //         none: {
-  //           statusReserva: { not: 'CANCELADA' },
-  //           AND: [
-  //             { dataInicio: { lte: reserva.dataFim } },
-  //             { dataFim: { gte: reserva.dataInicio } },
-  //             { horaInicial: { lt: reserva.horaFinal } },
-  //             { horaFinal: { gt: reserva.horaInicial } },
-  //           ],
-  //         },
-  //       },
-
-  //       // Equipamentos e mobiliários compatíveis
-  //       AND: [
-  //         {
-  //           Equipamentos: {
-  //             some: {
-  //               tipoEquipamento: { in: reserva.equipamentos },
-  //             },
-  //           },
-  //         },
-  //         {
-  //           Mobiliarios: {
-  //             some: {
-  //               tipoMobiliario: { in: reserva.mobiliarios },
-  //             },
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     include: {
-  //       bloco: true,
-  //       Equipamentos: true,
-  //       Mobiliarios: true,
-  //     },
-  //   });
-  // }
+      })
+    }
+    console.log("Salas em outro setor: ", salas)
+    return salas
+  }
 
   update(id: string, updateSalaDto: UpdateSalaDto) {
     return this.prismaService.sala.update({
