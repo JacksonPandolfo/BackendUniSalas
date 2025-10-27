@@ -26,7 +26,7 @@ export class ReservaService {
 
   findManyBySala(salaId: string) {
     return this.prismaService.reserva.findMany({
-      where: {salaId: salaId},
+      where: {salaId: salaId, statusReserva: "APROVADA"},
       include: {
         sala: true,
         horario: true,

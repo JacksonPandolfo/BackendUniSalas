@@ -136,9 +136,7 @@ export class SalaService {
 
     if(salas.length === 0 && reserva.setorPreferidoId) {
       const { bloco, ...wherePrincipalSemBloco} = wherePrincipal
-      // const whereAlternativo = {
-      //     ...wherePrincipal,
-      // }
+
       salas = await this.prismaService.sala.findMany({
         where: wherePrincipalSemBloco,
         include: {
@@ -174,7 +172,7 @@ export class SalaService {
         },
       })
     }
-    console.log("Salas em outro setor: ", salas)
+
     return salas
   }
 
