@@ -1,98 +1,77 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# UniSalas · Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API do UniSalas, sistema de reserva de salas acadêmicas desenvolvido por Jackson Pandolfo como trabalho de conclusão de curso. A API conecta os pedidos de professores e funcionários ao trabalho da equipe que administra os espaços. Cada solicitação reúne os dados do evento, a quantidade de participantes e os recursos necessários para escolher uma sala.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+O projeto usa **NestJS 11, TypeScript, Prisma ORM 6 e PostgreSQL**. A [interface web do UniSalas](https://github.com/JacksonPandolfo/FrontendUniSalas) consome a API.
 
-## Description
+## Como o domínio está organizado
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Espaços.** Cada setor contém blocos, e cada bloco contém salas. A sala registra capacidade, acessibilidade, equipamentos e mobiliário.
+- **Reservas.** Uma solicitação pode ser esporádica ou recorrente. O registro associa solicitante, ministrante e aprovador e pode aguardar a definição da sala. Os estados previstos são `PENDENTE`, `APROVADA` e `CANCELADA`.
+- **Ocupação.** Uma rotina executada a cada minuto consulta reservas aprovadas e atualiza o estado das salas de acordo com o horário.
+- **Usuários.** A aplicação distingue ministrantes, funcionários, atendimento e administradores. As senhas são armazenadas com bcrypt, e o login entrega um JWT no cookie HTTP-only `jwt`.
 
-## Project setup
+## Executar localmente
+
+Use Node.js 22, npm e uma instância de PostgreSQL com um banco **vazio e dedicado ao projeto**. No exemplo, o banco se chama `unisalas`.
 
 ```bash
-$ npm install
+git clone https://github.com/JacksonPandolfo/BackendUniSalas.git
+cd BackendUniSalas
 ```
 
-## Compile and run the project
+Crie um arquivo `.env` na raiz. Ajuste o usuário, a senha e a porta do PostgreSQL para a sua instalação. Gere um segredo local, por exemplo com `node -p "require('node:crypto').randomBytes(32).toString('hex')"`, e use o mesmo valor no frontend.
+
+```dotenv
+DATABASE_URL=postgresql://usuario:senha@localhost:5432/unisalas
+JWT_SECRET=cole_aqui_o_segredo_gerado
+FRONTEND_URL=http://localhost:3000
+PORT=8000
+```
+
+Instale as dependências, crie as tabelas a partir do schema atual e inicie a API:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm ci
+npx prisma db push
+npx prisma generate
+node --env-file=.env --run start:dev
 ```
 
-## Run tests
+A API atende em `http://localhost:8000`. O comando de inicialização carrega as variáveis antes de o NestJS configurar a autenticação.
+
+**Por que usar `db push` neste exemplo?** A migração inicial versionada é anterior ao [schema atual](prisma/schema.prisma). Por exemplo, ela não cria o tipo `StatusReserva` usado pela aplicação. Para reproduzir o projeto em um banco local novo, `db push` cria a estrutura esperada pelo código. Bancos existentes exigem uma migração que preserve seus dados.
+
+## Primeira execução
+
+O repositório não inclui dados de demonstração. Para experimentar o fluxo completo:
+
+1. Inicie o [frontend](https://github.com/JacksonPandolfo/FrontendUniSalas) e, pela tela de cadastro, crie um ministrante e um segundo usuário de atendimento para receber o pedido.
+2. No banco local, use `npx prisma studio` para criar um setor, um bloco vinculado ao setor e uma sala vinculada ao bloco. Preencha a capacidade e a acessibilidade da sala. Para demonstrar uma aula vinculada a uma turma, prepare também os respectivos dados acadêmicos.
+3. Entre como ministrante para solicitar uma reserva. Depois, entre como o aprovador para selecionar a sala e acompanhar a mudança de status.
+
+## Consultar a API
+
+Os exemplos abaixo usam os caminhos do NestJS. As rotas de reserva exigem o cookie `jwt` obtido no login.
+
+| Método e rota | Uso |
+| --- | --- |
+| `POST /usuario` | Cadastrar um usuário |
+| `POST /auth/login` | Autenticar com e-mail e senha e receber o cookie de sessão |
+| `POST /reserva` | Registrar uma solicitação |
+| `GET /reserva/byUsuario/:id` | Listar pedidos em que o usuário é solicitante ou aprovador |
+| `GET /reserva/bySala/:id` | Consultar reservas aprovadas de uma sala |
+| `PATCH /reserva/:id` | Atualizar uma reserva, inclusive a sala e o status |
+| `POST /auth/logout` | Encerrar a sessão |
+
+Com uma conta local já cadastrada, estes comandos permitem testar o login e reutilizar o cookie para consultar as reservas. Substitua o e-mail e a senha pelos valores da sua conta de demonstração.
 
 ```bash
-# unit tests
-$ npm run test
+curl -c cookies.txt -H 'Content-Type: application/json' \
+  -d '{"email":"docente@unisinos.br","senha":"senha-da-conta-local"}' \
+  http://localhost:8000/auth/login
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+curl -b cookies.txt http://localhost:8000/reserva
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Os módulos de [reservas](src/reserva), [salas](src/sala) e [autenticação](src/auth) concentram os respectivos controladores e serviços. Para compilar a API, execute `npm run build` após gerar o cliente Prisma.
